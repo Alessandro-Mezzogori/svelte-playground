@@ -154,11 +154,8 @@
 	}`;
 	$: classesDrawer = `${cDrawer} ${bgDrawer} ${border} ${rounded} ${shadow} ${classesWidth} ${classesHeight} ${classesRounded} ${regionDrawer}`;
     
-    let active: PolymorphicDrawerComponent<any> | undefined;
-    $: { 
-        active = $drawerStore.active;
-        console.log(active);
-    }
+    // let active: PolymorphicDrawerComponent<any> | undefined;
+    $: active = $drawerStore.active; 
 </script>
 
 
