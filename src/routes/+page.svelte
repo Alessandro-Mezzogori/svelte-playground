@@ -53,6 +53,9 @@
 	
 	const dataStore = readable(data);
 	const descriptor: TableDescription<Data> = {
+		page: {
+			initialPageSize: 5,
+		},
 		columns: [
 			{
 				key: "id",
@@ -71,7 +74,6 @@
 				header: "Age",
 			}
 		]
-
 	}
 </script>
 
