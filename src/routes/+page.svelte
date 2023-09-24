@@ -5,6 +5,11 @@
 	import Pd1 from "$lib/PolymorphicDrawer/test/PD1.svelte";
 	import Pd2 from "$lib/PolymorphicDrawer/test/PD2.svelte";
 	import Pd3 from "$lib/PolymorphicDrawer/test/PD3.svelte";
+	import DataTable from "$lib/DataTable/DataTable.svelte";
+	import { readable, writable } from "svelte/store";
+	import { createTable } from "svelte-headless-table";
+	import { addSortBy } from "svelte-headless-table/plugins";
+	import type { TableDescription } from "$lib/DataTable/datatable";
 
     drawerStore.set([
         drawerComponent<Pd1>({
@@ -29,21 +34,55 @@
             }
         }),
     ]);
+	
+	type Data = {
+		id: number;
+		name: string;
+		surname: string,
+		age: number;
+	};
+
+	const data: Data[] = Array.from({length: 10}, (_, i) => {
+		return {
+			id: i,
+			name: `Nam ${i}`,
+			surname: `Surname ${100 - i}`,
+			age: i * 10
+		} satisfies Data;
+	});
+	
+	const dataStore = readable(data);
+	const descriptor: TableDescription<Data> = {
+		columns: [
+			{
+				key: "id",
+				header: "Id",
+			},
+			{
+				key: "name",
+				header: "Name",
+			},
+			{
+				key: "surname",
+				header: "Surname",
+			},
+			{
+				key: "age",
+				header: "Age",
+			}
+		]
+
+	}
 </script>
 
 <PolymorphicDrawer />
 
 
-<div class="container h-full mx-auto flex justify-center items-center">
+<div class="container h-full mx-auto flex justify-center items-center flex-col gap-5">
 	<div class="space-y-5">
 		<h1 class="h1">Let's get cracking bones!</h1>
 		<p>Start by exploring:</p>
 		<ul>
-			<li><code class="code">/src/routes/+layout.svelte</code> - barebones layout</li>
-			<li><code class="code">/src/app.postcss</code> - app wide css</li>
-			<li>
-				<code class="code">/src/routes/+page.svelte</code> - this page, you can replace the contents
-			</li>
 			<li>
 				{#each $drawerStore.components as component, i}
 					<button on:click={() => drawerStore.active(component.key, true)} class="btn">
@@ -52,5 +91,11 @@
 				{/each}
 			</li>
 		</ul>
+	</div>
+	<div class="bg-red-900">
+		<DataTable 
+			data={dataStore} 
+			descriptor={descriptor}
+			/>
 	</div>
 </div>

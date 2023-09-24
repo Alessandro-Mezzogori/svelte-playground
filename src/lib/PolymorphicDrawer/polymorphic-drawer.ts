@@ -38,21 +38,21 @@ function createDrawerStore(){
         open: false
     });
     
-    function add(component: PolymorphicDrawerComponent<any>){
+    function addFunc(component: PolymorphicDrawerComponent<any>){
         update((store) => {
             store.components.push(component);
             return store;
         });
     }
     
-    function remove(key: string){
+    function removeFunc(key: string){
         update((store) => {
             store.components = store.components.filter((c) => c.key !== key);
             return store;
         });
     }
     
-    function active(key: string, open: boolean = true){
+    function activeFunc(key: string, open: boolean = true){
         update((store) => {
             store.active = store.components.find((c) => c.key === key);
             store.open = open;
@@ -60,7 +60,7 @@ function createDrawerStore(){
         });
     }
 
-    function setStore(components: PolymorphicDrawerComponent<any>[]){
+    function setFunc(components: PolymorphicDrawerComponent<any>[]){
         set({
             components,
             active: undefined,
@@ -75,7 +75,7 @@ function createDrawerStore(){
         });
     }
     
-    function close(){
+    function closeFunc(){
         console.log("close");
         update((store) => {
             store.open = false;
@@ -85,12 +85,12 @@ function createDrawerStore(){
     
     return {
         subscribe,
-        set: setStore,
-        add,
-        remove,
-        active,
-        open,
-        close
+        set: setFunc,
+        add: addFunc,
+        remove: removeFunc,
+        active: activeFunc,
+        open: openFunc,
+        close: closeFunc
     };
 }
 
