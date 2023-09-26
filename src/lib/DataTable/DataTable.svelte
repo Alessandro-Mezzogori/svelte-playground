@@ -82,59 +82,109 @@
         pluginStates, // per qualche motivo quando pluginStates viene destrutturato non funziona piú la reattivita del dom
     } = table.createViewModel(columns);
     
+    const { 
+        pageCount,
+        pageIndex,
+        pageSize,
+        hasPreviousPage,
+        hasNextPage,
+    } = pluginStates.page;
 </script>
 
-<table {...$tableAttrs} class="{tableClass}">
-    <thead>
-        {#each $headerRows as headerRow (headerRow.id)}
-           <Subscribe rowAttrs={headerRow.attrs()} let:rowAttrs>
-                <tr {...rowAttrs}>
-                    {#each headerRow.cells as cell (cell.id)}
-                        <Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-                            <th 
-                                {...attrs} 
-                                on:click={props.sort.toggle}
-                                use:props.resize
-                                class="relative overflow-hidden"
-                                >
-                                <div class="flex justify-between items-center gap-2">
-                                    <Render of={cell.render()} />
-                                    
-                                    <div 
-                                        class:table-sort-asc={props.sort.order === 'asc'} 
-                                        class:table-sort-dsc={props.sort.order === 'desc'} />
-                                </div>
+<div class="bg-surface-800">
+    <div class="items-center">
+        table header
+    </div>  
+    <table {...$tableAttrs} class="{tableClass}">
+        <thead>
+            {#each $headerRows as headerRow (headerRow.id)}
+               <Subscribe rowAttrs={headerRow.attrs()} let:rowAttrs>
+                    <tr {...rowAttrs}>
+                        {#each headerRow.cells as cell (cell.id)}
+                            <Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
+                                <th 
+                                    {...attrs} 
+                                    on:click={props.sort.toggle}
+                                    use:props.resize
+                                    class="relative overflow-hidden"
+                                    >
+                                    <div class="flex justify-between items-center gap-2">
+                                        <Render of={cell.render()} />
+                                        
+                                        <div 
+                                            class:table-sort-asc={props.sort.order === 'asc'} 
+                                            class:table-sort-dsc={props.sort.order === 'desc'} />
+                                    </div>
 
-                                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                                <div 
-                                    role="separator"
-                                    class="resizer bg-surface-400 hover:bg-tertiary-500"  
-                                    use:props.resize.drag
-                                    />
-                            </th>
-                        </Subscribe>
-                    {/each}
-                </tr>
-            </Subscribe>
-        {/each}
-    </thead>
-    <tbody {...$tableBodyAttrs}>
-        {#each $pageRows as row (row.id)}
-            <Subscribe rowAttrs={row.attrs()} let:rowAttrs rowProps={row.props()} let:rowProps>
-                <tr {...rowAttrs} class:table-row-checked={rowProps.select.selected}>
-                    {#each row.cells as cell (cell.id)}
-                        <Subscribe attrs={cell.attrs()} let:attrs>
-                            <td {...attrs} class="overflow-hidden">
-                                <Render of={cell.render()} />
-                            </td>
-                        </Subscribe>
-                    {/each}
-                </tr>
-            </Subscribe>   
-        {/each}
-    </tbody>
-</table>
+                                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                                    <div 
+                                        role="separator"
+                                        class="resizer bg-surface-400 hover:bg-tertiary-500"  
+                                        use:props.resize.drag
+                                        />
+                                </th>
+                            </Subscribe>
+                        {/each}
+                    </tr>
+                </Subscribe>
+            {/each}
+        </thead>
+        <tbody {...$tableBodyAttrs}>
+            {#each $pageRows as row (row.id)}
+                <Subscribe rowAttrs={row.attrs()} let:rowAttrs rowProps={row.props()} let:rowProps>
+                    <tr {...rowAttrs} class:table-row-checked={rowProps.select.selected}>
+                        {#each row.cells as cell (cell.id)}
+                            <Subscribe attrs={cell.attrs()} let:attrs>
+                                <td {...attrs} class="overflow-hidden">
+                                    <Render of={cell.render()} />
+                                </td>
+                            </Subscribe>
+                        {/each}
+                    </tr>
+                </Subscribe>   
+            {/each}
+        </tbody>
+        <tfoot>
+            
+        </tfoot>
+    </table>
+    <div class="flex justify-between items-center">
+        <span class="text-sm">
+            {$pageIndex * $pageSize}-{($pageIndex + 1) * $pageSize  - 1} of {$data.length}
+        </span>
+        <div>
+            <!-- TODO TEMP, probabilmente meglio trovare un altro posto se non fargli accedere al di fuori della tabella o nell'sopra all'header ( tipo nascosto o in delle opzioni )-->
+            <select class="input text-sm" value={$pageSize.toString()} on:change={(e) => { $pageSize = parseInt(e.currentTarget.value); console.log(e)}}>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>   
+        </div>
+        <div class="flex items-center">
+            <button 
+                class="btn btn-tertiary btn-sm" 
+                disabled={!$hasPreviousPage}
+                on:click={() => $pageIndex -= 1}
+                >
+                Previous
+            </button>
+            <div class="text-sm">
+                {$pageIndex + 1} of {$pageCount}
+            </div> 
+            <button 
+                class="btn btn-tertiary btn-sm" 
+                disabled={!$hasNextPage}
+                on:click={() => $pageIndex += 1}
+                >
+                Next
+            </button>
+        </div>
+    </div>
+</div>
+
 
 <style>
     .resizer {
